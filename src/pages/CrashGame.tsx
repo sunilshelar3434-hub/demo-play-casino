@@ -172,7 +172,8 @@ const CrashGame = () => {
       );
 
       // Auto cash out
-      if (autoCashOut > 0 && mult >= autoCashOut && gameState === "running") {
+      if (autoCashOutRef.current > 0 && mult >= autoCashOutRef.current && gameStateRef.current === "running") {
+        gameStateRef.current = "cashed_out";
         cashOutInternal(mult);
         return;
       }
