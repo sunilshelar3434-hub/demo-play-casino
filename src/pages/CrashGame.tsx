@@ -149,6 +149,8 @@ const CrashGame = () => {
     currentMultRef.current = 1.0;
     setCashedOutAt(0);
     setGameState("running");
+    gameStateRef.current = "running";
+    autoCashOutRef.current = autoCashOut;
     pointsRef.current = [1.0];
 
     const players = generateFakePlayers(cp);
