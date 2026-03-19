@@ -31,6 +31,8 @@ const CrashGame = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pointsRef = useRef<number[]>([]);
   const currentMultRef = useRef(1.0);
+  const autoCashOutRef = useRef(0);
+  const gameStateRef = useRef<"idle" | "running" | "crashed" | "cashed_out">("idle");
 
   const generateCrashPoint = () => {
     const r = Math.random();
