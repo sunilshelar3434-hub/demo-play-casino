@@ -2,53 +2,56 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
 @layer base {
   :root {
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
+    --background: 220 13% 6%;
+    --foreground: 0 0% 95%;
 
-    --card: 217 33% 17%;
-    --card-foreground: 210 40% 98%;
+    --card: 220 13% 10%;
+    --card-foreground: 0 0% 95%;
 
-    --popover: 217 33% 17%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 220 13% 10%;
+    --popover-foreground: 0 0% 95%;
 
-    --primary: 160 84% 39%;
-    --primary-foreground: 222 47% 11%;
+    --primary: 142 71% 45%;
+    --primary-foreground: 220 13% 6%;
 
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 220 13% 14%;
+    --secondary-foreground: 0 0% 95%;
 
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 25% 63%;
+    --muted: 220 13% 14%;
+    --muted-foreground: 220 9% 55%;
 
     --accent: 217 91% 60%;
-    --accent-foreground: 210 40% 98%;
+    --accent-foreground: 0 0% 95%;
 
     --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 95%;
 
-    --border: 217 33% 24%;
-    --input: 217 33% 24%;
-    --ring: 160 84% 39%;
+    --border: 220 13% 18%;
+    --input: 220 13% 18%;
+    --ring: 142 71% 45%;
 
     --radius: 0.75rem;
 
-    --surface: 222 47% 15%;
-    --win: 160 84% 39%;
+    --surface: 220 13% 12%;
+    --win: 142 71% 45%;
     --lose: 0 84% 60%;
     --interactive: 217 91% 60%;
 
-    --sidebar-background: 222 47% 11%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 160 84% 39%;
-    --sidebar-primary-foreground: 222 47% 11%;
-    --sidebar-accent: 217 33% 17%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 217 33% 24%;
-    --sidebar-ring: 160 84% 39%;
+    --glass: 220 13% 10% / 0.6;
+    --glass-border: 220 13% 22% / 0.5;
+
+    --sidebar-background: 220 13% 8%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 142 71% 45%;
+    --sidebar-primary-foreground: 220 13% 6%;
+    --sidebar-accent: 220 13% 14%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 220 13% 18%;
+    --sidebar-ring: 142 71% 45%;
   }
 }
 
@@ -61,11 +64,27 @@
     @apply bg-background text-foreground font-sans antialiased;
     font-family: 'Inter', sans-serif;
   }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--background));
+  }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground));
+  }
 }
 
 @layer utilities {
   .glow-green {
-    box-shadow: 0 0 20px hsl(160 84% 39% / 0.3), 0 0 60px hsl(160 84% 39% / 0.1);
+    box-shadow: 0 0 20px hsl(142 71% 45% / 0.3), 0 0 60px hsl(142 71% 45% / 0.1);
   }
 
   .glow-red {
@@ -77,7 +96,7 @@
   }
 
   .text-glow-green {
-    text-shadow: 0 0 10px hsl(160 84% 39% / 0.5);
+    text-shadow: 0 0 10px hsl(142 71% 45% / 0.5);
   }
 
   .text-glow-red {
@@ -86,6 +105,29 @@
 
   .btn-press {
     @apply transition-transform duration-100 active:scale-95;
+  }
+
+  .glass {
+    background: hsl(var(--glass));
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid hsl(var(--glass-border));
+  }
+
+  .glass-card {
+    background: hsl(var(--glass));
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid hsl(var(--glass-border));
+    border-radius: var(--radius);
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }
 
@@ -103,4 +145,14 @@
 @keyframes countUp {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
 }
