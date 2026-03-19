@@ -2,11 +2,12 @@ import { useState } from "react";
 import { useBalance } from "@/contexts/BalanceContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { playClick, playWin, playLose } from "@/lib/sounds";
 
 type BetMode = "under" | "over";
 
 const DiceGame = () => {
-  const { balance, placeBet, addWinnings, addResult } = useBalance();
+  const { balance, placeBet, addWinnings, addResult, screenShake } = useBalance();
   const [betAmount, setBetAmount] = useState(10);
   const [target, setTarget] = useState(50);
   const [mode, setMode] = useState<BetMode>("over");
@@ -20,12 +21,12 @@ const DiceGame = () => {
   const roll = () => {
     if (rolling) return;
     if (!placeBet(betAmount)) return;
+    playClick();
 
     setRolling(true);
     setResult(null);
     setWon(null);
 
-    // Animate rapid numbers
     let count = 0;
     const interval = setInterval(() => {
       setResult(Math.floor(Math.random() * 100) + 1);
@@ -39,10 +40,12 @@ const DiceGame = () => {
         setWon(isWin);
 
         if (isWin) {
+          playWin();
           const payout = betAmount * multiplier;
           addWinnings(payout);
           addResult({ game: "Dice", bet: betAmount, multiplier, payout, won: true });
         } else {
+          playLose();
           addResult({ game: "Dice", bet: betAmount, multiplier: 0, payout: 0, won: false });
         }
 
@@ -52,11 +55,13 @@ const DiceGame = () => {
   };
 
   return (
-    <div className="container max-w-4xl py-8 animate-fade-in">
+    <div
+      className="container max-w-4xl py-8 animate-fade-in"
+      style={screenShake ? { animation: "shake 0.4s ease-out" } : undefined}
+    >
       <h1 className="mb-8 text-3xl font-extrabold text-foreground">Dice</h1>
 
       <div className="grid gap-6 md:grid-cols-[1fr_2fr]">
-        {/* Controls */}
         <div className="space-y-4 rounded-xl border border-border bg-card p-6">
           <div>
             <label className="mb-1 block text-sm font-medium text-muted-foreground">Bet Amount</label>
@@ -87,18 +92,10 @@ const DiceGame = () => {
           </div>
 
           <div className="flex gap-2">
-            <Button
-              variant={mode === "over" ? "default" : "outline"}
-              className="flex-1"
-              onClick={() => setMode("over")}
-            >
+            <Button variant={mode === "over" ? "default" : "outline"} className="flex-1" onClick={() => setMode("over")}>
               Over {target}
             </Button>
-            <Button
-              variant={mode === "under" ? "default" : "outline"}
-              className="flex-1"
-              onClick={() => setMode("under")}
-            >
+            <Button variant={mode === "under" ? "default" : "outline"} className="flex-1" onClick={() => setMode("under")}>
               Under {target}
             </Button>
           </div>
@@ -119,7 +116,6 @@ const DiceGame = () => {
           </Button>
         </div>
 
-        {/* Stage */}
         <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-card p-8">
           <div
             className={`text-8xl font-extrabold tabular-nums transition-all duration-200 ${
@@ -131,12 +127,14 @@ const DiceGame = () => {
           </div>
 
           {won !== null && !rolling && (
-            <div className={`mt-4 text-xl font-bold ${won ? "text-win" : "text-lose"}`}>
+            <div
+              className={`mt-4 text-xl font-bold ${won ? "text-win" : "text-lose"}`}
+              style={{ animation: "countUp 0.3s ease-out" }}
+            >
               {won ? `You won ${(betAmount * multiplier).toFixed(2)} credits!` : "Better luck next time!"}
             </div>
           )}
 
-          {/* Visual bar */}
           <div className="mt-8 w-full max-w-md">
             <div className="relative h-3 w-full overflow-hidden rounded-full bg-secondary">
               {mode === "over" ? (

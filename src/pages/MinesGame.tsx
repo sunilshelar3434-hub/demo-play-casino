@@ -2,15 +2,16 @@ import { useState, useCallback } from "react";
 import { useBalance } from "@/contexts/BalanceContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Gem, Bomb } from "lucide-react";
+import { Gem, Bomb, Skull } from "lucide-react";
+import { playClick, playReveal, playWin, playMineHit, playCashOut } from "@/lib/sounds";
 
 const GRID_SIZE = 5;
 const TOTAL_TILES = GRID_SIZE * GRID_SIZE;
 
-type TileState = "hidden" | "gem" | "mine";
+type TileState = "hidden" | "gem" | "mine" | "near-miss";
 
 const MinesGame = () => {
-  const { balance, placeBet, addWinnings, addResult } = useBalance();
+  const { balance, placeBet, addWinnings, addResult, screenShake } = useBalance();
   const [betAmount, setBetAmount] = useState(10);
   const [mineCount, setMineCount] = useState(5);
   const [gameState, setGameState] = useState<"idle" | "playing" | "won" | "lost">("idle");
@@ -18,20 +19,37 @@ const MinesGame = () => {
   const [minePositions, setMinePositions] = useState<Set<number>>(new Set());
   const [revealed, setRevealed] = useState(0);
   const [currentMultiplier, setCurrentMultiplier] = useState(1.0);
+  const [lastRevealed, setLastRevealed] = useState<number | null>(null);
 
   const calcMultiplier = useCallback((picks: number, mines: number) => {
-    // Simple multiplier based on probability
     let mult = 1;
     for (let i = 0; i < picks; i++) {
       mult *= (TOTAL_TILES - mines - i) > 0 ? (TOTAL_TILES - i) / (TOTAL_TILES - mines - i) : 1;
     }
-    return +(mult * 0.97).toFixed(2); // 3% house edge
+    return +(mult * 0.97).toFixed(2);
   }, []);
+
+  const getAdjacentIndices = (index: number) => {
+    const row = Math.floor(index / GRID_SIZE);
+    const col = index % GRID_SIZE;
+    const adj: number[] = [];
+    for (let dr = -1; dr <= 1; dr++) {
+      for (let dc = -1; dc <= 1; dc++) {
+        if (dr === 0 && dc === 0) continue;
+        const nr = row + dr;
+        const nc = col + dc;
+        if (nr >= 0 && nr < GRID_SIZE && nc >= 0 && nc < GRID_SIZE) {
+          adj.push(nr * GRID_SIZE + nc);
+        }
+      }
+    }
+    return adj;
+  };
 
   const startGame = () => {
     if (!placeBet(betAmount)) return;
+    playClick();
 
-    // Place mines randomly
     const positions = new Set<number>();
     while (positions.size < mineCount) {
       positions.add(Math.floor(Math.random() * TOTAL_TILES));
@@ -40,6 +58,7 @@ const MinesGame = () => {
     setTiles(Array(TOTAL_TILES).fill("hidden"));
     setRevealed(0);
     setCurrentMultiplier(1.0);
+    setLastRevealed(null);
     setGameState("playing");
   };
 
@@ -49,10 +68,16 @@ const MinesGame = () => {
     const newTiles = [...tiles];
 
     if (minePositions.has(index)) {
-      // Hit a mine - reveal all
+      playMineHit();
       newTiles[index] = "mine";
+
+      // Near-miss: show mines adjacent to last safe pick
       minePositions.forEach((pos) => {
-        newTiles[pos] = "mine";
+        if (pos !== index) {
+          const adj = getAdjacentIndices(pos);
+          const isNearLastSafe = lastRevealed !== null && adj.includes(lastRevealed);
+          newTiles[pos] = isNearLastSafe ? "near-miss" : "mine";
+        }
       });
       setTiles(newTiles);
       setGameState("lost");
@@ -60,15 +85,17 @@ const MinesGame = () => {
       return;
     }
 
+    playReveal();
     newTiles[index] = "gem";
     setTiles(newTiles);
+    setLastRevealed(index);
     const newRevealed = revealed + 1;
     setRevealed(newRevealed);
     const mult = calcMultiplier(newRevealed, mineCount);
     setCurrentMultiplier(mult);
 
-    // Auto-win if all safe tiles revealed
     if (newRevealed === TOTAL_TILES - mineCount) {
+      playWin();
       const payout = betAmount * mult;
       addWinnings(payout);
       addResult({ game: "Mines", bet: betAmount, multiplier: mult, payout, won: true });
@@ -78,11 +105,11 @@ const MinesGame = () => {
 
   const cashOut = () => {
     if (gameState !== "playing" || revealed === 0) return;
+    playCashOut();
     const payout = betAmount * currentMultiplier;
     addWinnings(payout);
     addResult({ game: "Mines", bet: betAmount, multiplier: currentMultiplier, payout, won: true });
 
-    // Reveal all mines
     const newTiles = [...tiles];
     minePositions.forEach((pos) => {
       if (newTiles[pos] === "hidden") newTiles[pos] = "mine";
@@ -91,19 +118,27 @@ const MinesGame = () => {
     setGameState("won");
   };
 
-  const getTileClasses = (state: TileState) => {
+  const getTileClasses = (state: TileState, index: number) => {
+    const isLastRevealed = index === lastRevealed;
     switch (state) {
       case "hidden":
         return "bg-secondary hover:bg-secondary/70 border-border cursor-pointer hover:scale-105";
       case "gem":
-        return "bg-primary/20 border-primary/50";
+        return `bg-primary/20 border-primary/50 ${isLastRevealed ? "ring-2 ring-primary/50" : ""}`;
       case "mine":
         return "bg-destructive/20 border-destructive/50";
+      case "near-miss":
+        return "bg-destructive/30 border-destructive/70 ring-2 ring-destructive/40";
     }
   };
 
+  const isHighMultiplier = currentMultiplier >= 3;
+
   return (
-    <div className="container max-w-4xl py-8 animate-fade-in">
+    <div
+      className="container max-w-4xl py-8 animate-fade-in"
+      style={screenShake ? { animation: "shake 0.4s ease-out" } : undefined}
+    >
       <h1 className="mb-8 text-3xl font-extrabold text-foreground">Mines</h1>
 
       <div className="grid gap-6 md:grid-cols-[1fr_2fr]">
@@ -139,9 +174,15 @@ const MinesGame = () => {
           </div>
 
           {gameState === "playing" && (
-            <div className="rounded-lg bg-secondary p-3 text-center">
+            <div
+              className={`rounded-lg p-3 text-center transition-all duration-300 ${
+                isHighMultiplier ? "bg-primary/10 glow-green" : "bg-secondary"
+              }`}
+            >
               <span className="text-sm text-muted-foreground">Current Multiplier</span>
-              <p className="text-2xl font-bold text-primary">{currentMultiplier}x</p>
+              <p className={`text-2xl font-bold ${isHighMultiplier ? "text-primary text-glow-green" : "text-primary"}`}>
+                {currentMultiplier}x
+              </p>
               <p className="text-xs text-muted-foreground">
                 Payout: {(betAmount * currentMultiplier).toFixed(2)}
               </p>
@@ -153,24 +194,18 @@ const MinesGame = () => {
               {gameState === "idle" ? "Start Game" : "Play Again"}
             </Button>
           ) : (
-            <Button
-              className="w-full"
-              size="lg"
-              variant="accent"
-              onClick={cashOut}
-              disabled={revealed === 0}
-            >
+            <Button className="w-full" size="lg" variant="accent" onClick={cashOut} disabled={revealed === 0}>
               Cash Out ({(betAmount * currentMultiplier).toFixed(2)})
             </Button>
           )}
 
           {gameState === "won" && (
-            <div className="text-center text-lg font-bold text-win text-glow-green">
+            <div className="text-center text-lg font-bold text-win text-glow-green" style={{ animation: "countUp 0.3s ease-out" }}>
               Won {(betAmount * currentMultiplier).toFixed(2)} credits!
             </div>
           )}
           {gameState === "lost" && (
-            <div className="text-center text-lg font-bold text-lose text-glow-red">
+            <div className="text-center text-lg font-bold text-lose text-glow-red" style={{ animation: "shake 0.3s ease-out" }}>
               Boom! You hit a mine! 💥
             </div>
           )}
@@ -183,10 +218,12 @@ const MinesGame = () => {
                 key={i}
                 onClick={() => revealTile(i)}
                 disabled={gameState !== "playing" || state !== "hidden"}
-                className={`flex items-center justify-center rounded-lg border transition-all duration-200 btn-press ${getTileClasses(state)}`}
+                className={`flex items-center justify-center rounded-lg border transition-all duration-200 btn-press ${getTileClasses(state, i)}`}
+                style={state === "gem" ? { animation: "countUp 0.2s ease-out" } : state === "mine" ? { animation: "shake 0.3s ease-out" } : undefined}
               >
                 {state === "gem" && <Gem className="h-5 w-5 text-primary" />}
                 {state === "mine" && <Bomb className="h-5 w-5 text-destructive" />}
+                {state === "near-miss" && <Skull className="h-5 w-5 text-destructive animate-pulse" />}
               </button>
             ))}
           </div>
