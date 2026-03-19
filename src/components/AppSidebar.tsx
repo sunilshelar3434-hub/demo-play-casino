@@ -1,4 +1,4 @@
-import { Home, Dices, Trophy, Gift, Crown, Wallet, TrendingUp, ChevronLeft, ChevronRight } from "lucide-react";
+import { Home, Dices, Trophy, Gift, Crown, Wallet, TrendingUp, ChevronLeft, ChevronRight, Medal } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import {
@@ -18,6 +18,7 @@ const mainItems = [
   { title: "Home", url: "/", icon: Home },
   { title: "Casino", url: "/casino", icon: Dices },
   { title: "Sports", url: "/sports", icon: TrendingUp },
+  { title: "Leaderboard", url: "/leaderboard", icon: Medal },
 ];
 
 const featureItems = [
@@ -37,7 +38,6 @@ export function AppSidebar() {
   const { state, toggleSidebar } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
-
   const isActive = (path: string) => location.pathname === path;
 
   return (
@@ -105,10 +105,7 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="p-2">
-        <button
-          onClick={toggleSidebar}
-          className="flex w-full items-center justify-center rounded-lg p-2 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
-        >
+        <button onClick={toggleSidebar} className="flex w-full items-center justify-center rounded-lg p-2 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors">
           {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
         </button>
       </SidebarFooter>

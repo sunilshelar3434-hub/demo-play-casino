@@ -1,5 +1,6 @@
 import { useBalance } from "@/contexts/BalanceContext";
-import { Search, Coins, RotateCcw, Wallet, Menu } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Search, Coins, RotateCcw, Wallet, Menu, LogIn, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
@@ -7,10 +8,12 @@ import { useSidebar } from "@/components/ui/sidebar";
 import StreakBadge from "@/components/StreakBadge";
 import BigWinOverlay from "@/components/BigWinOverlay";
 import WalletDropdown from "@/components/WalletDropdown";
+import NotificationBell from "@/components/NotificationBell";
 import { useNavigate } from "react-router-dom";
 
 const TopNavbar = () => {
   const { displayBalance, resetBalance, balancePulse, streak, bigWin, clearBigWin, screenShake } = useBalance();
+  const { user, profile, signOut } = useAuth();
   const { toggleSidebar } = useSidebar();
   const [walletOpen, setWalletOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -24,7 +27,6 @@ const TopNavbar = () => {
         style={screenShake ? { animation: "shake 0.4s ease-out" } : undefined}
       >
         <div className="flex h-14 items-center justify-between px-4 gap-4">
-          {/* Left: hamburger + logo */}
           <div className="flex items-center gap-3 shrink-0">
             <button onClick={toggleSidebar} className="p-1.5 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors lg:hidden">
               <Menu className="h-5 w-5" />
@@ -37,20 +39,13 @@ const TopNavbar = () => {
             </button>
           </div>
 
-          {/* Center: Search */}
           <div className="flex-1 max-w-md hidden md:block">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search games..."
-                className="pl-9 bg-secondary border-border h-9 text-sm"
-              />
+              <Input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search games..." className="pl-9 bg-secondary border-border h-9 text-sm" />
             </div>
           </div>
 
-          {/* Right: Balance + Actions */}
           <div className="flex items-center gap-2 shrink-0">
             <StreakBadge streak={streak} />
 
@@ -59,10 +54,10 @@ const TopNavbar = () => {
               style={balancePulse ? { animation: "pulse-balance 0.4s ease-out" } : undefined}
             >
               <Coins className="h-3.5 w-3.5 text-primary" />
-              <span className="font-bold text-foreground tabular-nums text-sm">
-                {displayBalance.toFixed(2)}
-              </span>
+              <span className="font-bold text-foreground tabular-nums text-sm">{displayBalance.toFixed(2)}</span>
             </div>
+
+            <NotificationBell />
 
             <div className="relative">
               <Button variant="outline" size="sm" onClick={() => setWalletOpen(!walletOpen)} className="gap-1.5">
@@ -72,9 +67,25 @@ const TopNavbar = () => {
               {walletOpen && <WalletDropdown onClose={() => setWalletOpen(false)} />}
             </div>
 
-            <Button variant="ghost" size="sm" onClick={resetBalance} className="gap-1.5">
+            {user ? (
+              <div className="flex items-center gap-2">
+                <Button variant="ghost" size="sm" onClick={() => navigate("/profile")} className="gap-1.5">
+                  <User className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">{profile?.username || "Profile"}</span>
+                </Button>
+                <Button variant="ghost" size="sm" onClick={signOut}>
+                  <LogOut className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+            ) : (
+              <Button size="sm" onClick={() => navigate("/auth")} className="gap-1.5">
+                <LogIn className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Sign In</span>
+              </Button>
+            )}
+
+            <Button variant="ghost" size="sm" onClick={resetBalance} className="gap-1.5 hidden sm:flex">
               <RotateCcw className="h-3 w-3" />
-              <span className="hidden sm:inline">Reset</span>
             </Button>
           </div>
         </div>
