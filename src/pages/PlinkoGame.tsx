@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useBalance } from "@/contexts/BalanceContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { playClick, playWin, playLose, playReveal } from "@/lib/sounds";
 
 const ROWS = 12;
 const PINS_PER_ROW = (row: number) => row + 3;
