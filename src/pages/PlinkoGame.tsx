@@ -94,6 +94,7 @@ const PlinkoGame = () => {
   const drop = () => {
     if (dropping) return;
     if (!placeBet(betAmount)) return;
+    playClick();
 
     setDropping(true);
     setLandedIndex(null);
