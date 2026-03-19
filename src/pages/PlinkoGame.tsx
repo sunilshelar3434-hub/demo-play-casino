@@ -132,6 +132,7 @@ const PlinkoGame = () => {
     const animate = () => {
       if (step < path.length) {
         setBallPos(path[step]);
+        if (step > 0) playReveal();
         step++;
         animFrameRef.current = requestAnimationFrame(() => {
           setTimeout(animate, 80);
@@ -141,6 +142,7 @@ const PlinkoGame = () => {
         const mult = multipliers[finalBucket];
         const payout = betAmount * mult;
         const isWin = mult >= 1;
+        if (isWin) { playWin(); } else { playLose(); }
         if (payout > 0) addWinnings(payout);
         addResult({ game: "Plinko", bet: betAmount, multiplier: mult, payout: isWin ? payout : 0, won: isWin });
         setTimeout(() => {
