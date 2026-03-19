@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useBalance } from "@/contexts/BalanceContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { playClick, playWin, playLose, playReveal } from "@/lib/sounds";
 
 const ROWS = 12;
 const PINS_PER_ROW = (row: number) => row + 3;
@@ -93,6 +94,7 @@ const PlinkoGame = () => {
   const drop = () => {
     if (dropping) return;
     if (!placeBet(betAmount)) return;
+    playClick();
 
     setDropping(true);
     setLandedIndex(null);
@@ -130,6 +132,7 @@ const PlinkoGame = () => {
     const animate = () => {
       if (step < path.length) {
         setBallPos(path[step]);
+        if (step > 0) playReveal();
         step++;
         animFrameRef.current = requestAnimationFrame(() => {
           setTimeout(animate, 80);
@@ -139,6 +142,7 @@ const PlinkoGame = () => {
         const mult = multipliers[finalBucket];
         const payout = betAmount * mult;
         const isWin = mult >= 1;
+        if (isWin) { playWin(); } else { playLose(); }
         if (payout > 0) addWinnings(payout);
         addResult({ game: "Plinko", bet: betAmount, multiplier: mult, payout: isWin ? payout : 0, won: isWin });
         setTimeout(() => {
