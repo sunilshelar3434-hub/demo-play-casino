@@ -13,11 +13,10 @@ import { useAuth } from "@/context/AuthContext";
 import { useMarketSuspensions } from "@/hooks/useMarketSuspensions";
 import { INITIAL_MATCHES } from "@/data/mockData";
 import { formatDistanceToNow } from "date-fns";
-import { Database } from "@/integrations/supabase/types";
 
 type AdminTab = "matches" | "bets" | "transactions" | "settlement" | "suspensions" | "limits" | "kyc" | "risk" | "multi_account" | "recovery";
-type Bet = Database["public"]["Tables"]["bets"]["Row"];
-type Transaction = Database["public"]["Tables"]["transactions"]["Row"];
+type Transaction = { id: string; user_id: string; type: string; amount: number; description: string | null; status: string; created_at: string; metadata: any; currency: string; balance_after?: number };
+type Bet = { id: string; user_id: string; match_id: string; match_title: string; market_name: string; selection_label: string; odds: number; stake: number; potential_win: number; status: string; profit_loss: number | null; placed_at: string; settled_at: string | null };
 
 const TABS: { key: AdminTab; label: string; icon: React.ReactNode }[] = [
   { key: "matches",       label: "Matches",       icon: <Trophy className="w-3.5 h-3.5" /> },
