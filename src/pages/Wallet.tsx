@@ -393,9 +393,9 @@ const Wallet: React.FC = () => {
                       >
                         {tx.amount > 0 ? "+" : ""}₹{Math.abs(tx.amount).toLocaleString("en-IN")}
                       </span>
-                      {tx.balance_after !== null && (
+                      {(tx as any).balance_after != null && (
                         <p className="font-mono text-[0.5rem] text-dim-foreground">
-                          Bal: ₹{tx.balance_after.toLocaleString("en-IN")}
+                          Bal: ₹{Number((tx as any).balance_after).toLocaleString("en-IN")}
                         </p>
                       )}
                     </div>
