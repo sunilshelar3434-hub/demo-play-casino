@@ -16,9 +16,9 @@ export function useMarketSuspensions() {
 
   const fetchSuspensions = useCallback(async () => {
     const { data } = await supabase
-      .from("market_suspensions")
+      .from("market_suspensions" as any)
       .select("id, match_id, market_name, reason, suspended_at");
-    if (data) setSuspensions(data as Suspension[]);
+    if (data) setSuspensions(data as any as Suspension[]);
   }, []);
 
   useEffect(() => {
