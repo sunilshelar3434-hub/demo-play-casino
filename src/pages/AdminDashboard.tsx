@@ -61,13 +61,13 @@ const AdminDashboard: React.FC = () => {
     if (!user) return;
     setLoading(true);
     const [{ data: allBets }, { data: allTx }, { data: limitsData }] = await Promise.all([
-      supabase.from("bets").select("*").order("placed_at", { ascending: false }).limit(200),
+      supabase.from("bets" as any).select("*").order("placed_at", { ascending: false }).limit(200),
       supabase.from("transactions").select("*").order("created_at", { ascending: false }).limit(200),
-      supabase.from("bet_limits").select("min_stake,max_stake,max_win").eq("market_name", "default").single(),
+      supabase.from("bet_limits" as any).select("min_stake,max_stake,max_win").eq("market_name", "default").single(),
     ]);
-    const betsData = allBets ?? [];
+    const betsData = (allBets as any[] ?? []) as Bet[];
     setBets(betsData);
-    setTransactions(allTx ?? []);
+    setTransactions((allTx ?? []) as Transaction[]);
     setStats({
       openBets:     betsData.filter((b) => b.status === "open").length,
       totalBets:    betsData.length,
@@ -75,10 +75,11 @@ const AdminDashboard: React.FC = () => {
       totalWagered: betsData.reduce((s, b) => s + Number(b.stake), 0),
     });
     if (limitsData) {
+      const ld = limitsData as any;
       setLimitsForm({
-        min_stake: String(limitsData.min_stake),
-        max_stake: String(limitsData.max_stake),
-        max_win:   String(limitsData.max_win),
+        min_stake: String(ld.min_stake),
+        max_stake: String(ld.max_stake),
+        max_win:   String(ld.max_win),
       });
     }
     setLoading(false);
