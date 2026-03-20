@@ -127,7 +127,7 @@ export function useBetSlip() {
 
     const sendTimer = setTimeout(async () => {
       try {
-        const { data, error } = await supabase.rpc("place_bet_atomic", {
+        const { data, error } = await supabase.rpc("place_bet_atomic" as any, {
           p_match_id:        sel.matchId,
           p_match_title:     sel.matchTitle,
           p_market_name:     sel.marketName,
