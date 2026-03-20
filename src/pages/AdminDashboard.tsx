@@ -120,8 +120,8 @@ const AdminDashboard: React.FC = () => {
 
   const handleSaveLimits = async () => {
     setLimitsSaving(true);
-    const { error } = await supabase
-      .from("bet_limits")
+    const { error } = await (supabase
+      .from("bet_limits" as any) as any)
       .update({ min_stake: Number(limitsForm.min_stake), max_stake: Number(limitsForm.max_stake), max_win: Number(limitsForm.max_win) })
       .eq("market_name", "default");
     setLimitsMsg(error ? { text: "Failed to save limits", ok: false } : { text: "Limits saved successfully", ok: true });

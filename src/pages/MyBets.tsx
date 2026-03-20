@@ -2,9 +2,8 @@ import React, { useState } from "react";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
 import { useBetsDB } from "@/hooks/useBetsDB";
-import { Database } from "@/integrations/supabase/types";
 
-type Bet = Database["public"]["Tables"]["bets"]["Row"];
+type BetStatus = "open" | "won" | "lost" | "void" | "cashout";
 type BetStatus = "open" | "won" | "lost" | "void" | "cashout";
 
 const TABS: { key: "open" | "settled" | "lost"; label: string; filter: BetStatus[] }[] = [
