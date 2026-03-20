@@ -25,7 +25,7 @@ export function useNotifications() {
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .limit(50);
-    setNotifications((data as Notification[]) ?? []);
+    setNotifications((data as any as Notification[]) ?? []);
     setLoading(false);
   }, [user]);
 
