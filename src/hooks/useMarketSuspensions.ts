@@ -42,7 +42,7 @@ export function useMarketSuspensions() {
     suspensions.some((s) => s.match_id === matchId && s.market_name === marketName);
 
   const suspendMarket = async (matchId: string, marketName: string, reason?: string) => {
-    await supabase.from("market_suspensions").upsert(
+    await (supabase.from("market_suspensions" as any) as any).upsert(
       { match_id: matchId, market_name: marketName, reason: reason ?? null, suspended_by: user?.id },
       { onConflict: "match_id,market_name" }
     );
