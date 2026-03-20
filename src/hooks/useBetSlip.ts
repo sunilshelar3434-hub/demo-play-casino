@@ -173,9 +173,8 @@ export function useBetSlip() {
               user_id:      user.id,
               type:         "bet_accepted",
               title:        "Bet Accepted",
-              body:         `${sel.selectionLabel} · ${sel.marketName} @ ${sel.odds.toFixed(2)} · Stake ₹${stakeAmount.toLocaleString("en-IN")}`,
-              reference_id: result.bet_id,
-            });
+              message:      `${sel.selectionLabel} · ${sel.marketName} @ ${sel.odds.toFixed(2)} · Stake ₹${stakeAmount.toLocaleString("en-IN")}`,
+            } as any);
           }
           return; // success path — let the ACCEPTED phase timer run
         }

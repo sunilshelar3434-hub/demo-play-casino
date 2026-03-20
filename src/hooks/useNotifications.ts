@@ -117,9 +117,8 @@ export function useNotifications() {
         user_id: user.id,
         type: notif.type,
         title: notif.title,
-        body: notif.body ?? null,
-        reference_id: notif.reference_id ?? null,
-      });
+        message: notif.body ?? notif.title,
+      } as any);
     },
     [user]
   );

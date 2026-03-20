@@ -50,7 +50,7 @@ export function useMarketSuspensions() {
 
   const unsuspendMarket = async (matchId: string, marketName: string) => {
     await supabase
-      .from("market_suspensions")
+      .from("market_suspensions" as any)
       .delete()
       .eq("match_id", matchId)
       .eq("market_name", marketName);
