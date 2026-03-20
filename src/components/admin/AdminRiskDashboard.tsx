@@ -123,7 +123,7 @@ const AdminRiskDashboard: React.FC = () => {
     setProcessing(true);
     // Calculate risk score from bet history
     const { data: bets } = await supabase
-      .from("bets")
+      .from("bets" as any)
       .select("status, stake, odds, profit_loss")
       .eq("user_id", userId);
 
