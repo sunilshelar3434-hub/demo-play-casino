@@ -14,138 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
-      bet_limits: {
-        Row: {
-          created_at: string
-          id: string
-          market_name: string
-          max_stake: number
-          max_win: number
-          min_stake: number
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          market_name?: string
-          max_stake?: number
-          max_win?: number
-          min_stake?: number
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          market_name?: string
-          max_stake?: number
-          max_win?: number
-          min_stake?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      bets: {
-        Row: {
-          id: string
-          market_name: string
-          match_id: string
-          match_title: string
-          odds: number
-          placed_at: string
-          potential_win: number
-          profit_loss: number | null
-          selection_label: string
-          settled_at: string | null
-          stake: number
-          status: string
-          user_id: string
-        }
-        Insert: {
-          id?: string
-          market_name: string
-          match_id: string
-          match_title: string
-          odds: number
-          placed_at?: string
-          potential_win: number
-          profit_loss?: number | null
-          selection_label: string
-          settled_at?: string | null
-          stake: number
-          status?: string
-          user_id: string
-        }
-        Update: {
-          id?: string
-          market_name?: string
-          match_id?: string
-          match_title?: string
-          odds?: number
-          placed_at?: string
-          potential_win?: number
-          profit_loss?: number | null
-          selection_label?: string
-          settled_at?: string | null
-          stake?: number
-          status?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      market_suspensions: {
-        Row: {
-          id: string
-          market_name: string
-          match_id: string
-          reason: string | null
-          suspended_at: string
-          suspended_by: string | null
-        }
-        Insert: {
-          id?: string
-          market_name: string
-          match_id: string
-          reason?: string | null
-          suspended_at?: string
-          suspended_by?: string | null
-        }
-        Update: {
-          id?: string
-          market_name?: string
-          match_id?: string
-          reason?: string | null
-          suspended_at?: string
-          suspended_by?: string | null
-        }
-        Relationships: []
-      }
       notifications: {
         Row: {
-          body: string | null
           created_at: string
           id: string
+          message: string
           read: boolean
-          reference_id: string | null
           title: string
           type: string
           user_id: string
         }
         Insert: {
-          body?: string | null
           created_at?: string
           id?: string
+          message: string
           read?: boolean
-          reference_id?: string | null
           title: string
           type?: string
           user_id: string
         }
         Update: {
-          body?: string | null
           created_at?: string
           id?: string
+          message?: string
           read?: boolean
-          reference_id?: string | null
           title?: string
           type?: string
           user_id?: string
@@ -154,135 +46,117 @@ export type Database = {
       }
       profiles: {
         Row: {
-          aadhaar_number: string | null
           avatar_url: string | null
+          balance: number
           created_at: string
-          date_of_birth: string | null
-          display_name: string | null
+          display_name: string
           id: string
-          kyc_reject_reason: string | null
-          kyc_reviewed_at: string | null
-          kyc_status: string
-          kyc_submitted_at: string | null
-          pan_number: string | null
-          phone: string | null
+          last_daily_bonus: string | null
+          total_bets: number
+          total_profit: number
+          total_wagered: number
+          total_wins: number
           updated_at: string
           user_id: string
-          username: string | null
+          username: string
+          vip_level: string
         }
         Insert: {
-          aadhaar_number?: string | null
           avatar_url?: string | null
+          balance?: number
           created_at?: string
-          date_of_birth?: string | null
-          display_name?: string | null
+          display_name?: string
           id?: string
-          kyc_reject_reason?: string | null
-          kyc_reviewed_at?: string | null
-          kyc_status?: string
-          kyc_submitted_at?: string | null
-          pan_number?: string | null
-          phone?: string | null
+          last_daily_bonus?: string | null
+          total_bets?: number
+          total_profit?: number
+          total_wagered?: number
+          total_wins?: number
           updated_at?: string
           user_id: string
-          username?: string | null
+          username?: string
+          vip_level?: string
         }
         Update: {
-          aadhaar_number?: string | null
           avatar_url?: string | null
+          balance?: number
           created_at?: string
-          date_of_birth?: string | null
-          display_name?: string | null
+          display_name?: string
           id?: string
-          kyc_reject_reason?: string | null
-          kyc_reviewed_at?: string | null
-          kyc_status?: string
-          kyc_submitted_at?: string | null
-          pan_number?: string | null
-          phone?: string | null
+          last_daily_bonus?: string | null
+          total_bets?: number
+          total_profit?: number
+          total_wagered?: number
+          total_wins?: number
           updated_at?: string
           user_id?: string
-          username?: string | null
+          username?: string
+          vip_level?: string
         }
         Relationships: []
       }
       transactions: {
         Row: {
           amount: number
-          balance_after: number | null
           created_at: string
+          currency: string
           description: string | null
           id: string
-          reference_id: string | null
+          metadata: Json | null
           status: string
           type: string
           user_id: string
         }
         Insert: {
           amount: number
-          balance_after?: number | null
           created_at?: string
+          currency?: string
           description?: string | null
           id?: string
-          reference_id?: string | null
+          metadata?: Json | null
           status?: string
           type: string
           user_id: string
         }
         Update: {
           amount?: number
-          balance_after?: number | null
           created_at?: string
+          currency?: string
           description?: string | null
           id?: string
-          reference_id?: string | null
+          metadata?: Json | null
           status?: string
           type?: string
           user_id?: string
         }
         Relationships: []
       }
-      user_roles: {
+      user_risk_scores: {
         Row: {
+          account_status: string
           created_at: string
-          id: string
-          role: Database["public"]["Enums"]["app_role"]
+          flags: string[]
+          last_evaluated_at: string | null
+          risk_level: string
+          risk_score: number
           user_id: string
         }
         Insert: {
+          account_status?: string
           created_at?: string
-          id?: string
-          role: Database["public"]["Enums"]["app_role"]
+          flags?: string[]
+          last_evaluated_at?: string | null
+          risk_level?: string
+          risk_score?: number
           user_id: string
         }
         Update: {
+          account_status?: string
           created_at?: string
-          id?: string
-          role?: Database["public"]["Enums"]["app_role"]
-          user_id?: string
-        }
-        Relationships: []
-      }
-      wallet_balances: {
-        Row: {
-          balance: number
-          bonus_balance: number
-          id: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          balance?: number
-          bonus_balance?: number
-          id?: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          balance?: number
-          bonus_balance?: number
-          id?: string
-          updated_at?: string
+          flags?: string[]
+          last_evaluated_at?: string | null
+          risk_level?: string
+          risk_score?: number
           user_id?: string
         }
         Relationships: []
@@ -292,28 +166,39 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      has_role: {
+      wallet_credit: {
         Args: {
-          _role: Database["public"]["Enums"]["app_role"]
-          _user_id: string
+          p_amount: number
+          p_description?: string
+          p_idempotency_key?: string
+          p_type: string
+          p_user_id: string
         }
-        Returns: boolean
+        Returns: Json
       }
-      place_bet_atomic: {
+      wallet_debit: {
         Args: {
-          p_market_name: string
-          p_match_id: string
-          p_match_title: string
-          p_odds: number
-          p_potential_win: number
-          p_selection_label: string
-          p_stake: number
+          p_amount: number
+          p_description?: string
+          p_idempotency_key?: string
+          p_type: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
+      wallet_get_balance: { Args: { p_user_id: string }; Returns: Json }
+      wallet_withdraw_with_checks: {
+        Args: {
+          p_amount: number
+          p_description?: string
+          p_idempotency_key?: string
+          p_user_id: string
         }
         Returns: Json
       }
     }
     Enums: {
-      app_role: "admin" | "moderator" | "user"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -440,8 +325,6 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {
-      app_role: ["admin", "moderator", "user"],
-    },
+    Enums: {},
   },
 } as const

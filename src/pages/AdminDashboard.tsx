@@ -13,11 +13,10 @@ import { useAuth } from "@/context/AuthContext";
 import { useMarketSuspensions } from "@/hooks/useMarketSuspensions";
 import { INITIAL_MATCHES } from "@/data/mockData";
 import { formatDistanceToNow } from "date-fns";
-import { Database } from "@/integrations/supabase/types";
 
 type AdminTab = "matches" | "bets" | "transactions" | "settlement" | "suspensions" | "limits" | "kyc" | "risk" | "multi_account" | "recovery";
-type Bet = Database["public"]["Tables"]["bets"]["Row"];
-type Transaction = Database["public"]["Tables"]["transactions"]["Row"];
+type Transaction = { id: string; user_id: string; type: string; amount: number; description: string | null; status: string; created_at: string; metadata: any; currency: string; balance_after?: number };
+type Bet = { id: string; user_id: string; match_id: string; match_title: string; market_name: string; selection_label: string; odds: number; stake: number; potential_win: number; status: string; profit_loss: number | null; placed_at: string; settled_at: string | null };
 
 const TABS: { key: AdminTab; label: string; icon: React.ReactNode }[] = [
   { key: "matches",       label: "Matches",       icon: <Trophy className="w-3.5 h-3.5" /> },
@@ -62,13 +61,13 @@ const AdminDashboard: React.FC = () => {
     if (!user) return;
     setLoading(true);
     const [{ data: allBets }, { data: allTx }, { data: limitsData }] = await Promise.all([
-      supabase.from("bets").select("*").order("placed_at", { ascending: false }).limit(200),
+      supabase.from("bets" as any).select("*").order("placed_at", { ascending: false }).limit(200),
       supabase.from("transactions").select("*").order("created_at", { ascending: false }).limit(200),
-      supabase.from("bet_limits").select("min_stake,max_stake,max_win").eq("market_name", "default").single(),
+      supabase.from("bet_limits" as any).select("min_stake,max_stake,max_win").eq("market_name", "default").single(),
     ]);
-    const betsData = allBets ?? [];
+    const betsData = (allBets as any[] ?? []) as Bet[];
     setBets(betsData);
-    setTransactions(allTx ?? []);
+    setTransactions((allTx ?? []) as Transaction[]);
     setStats({
       openBets:     betsData.filter((b) => b.status === "open").length,
       totalBets:    betsData.length,
@@ -76,10 +75,11 @@ const AdminDashboard: React.FC = () => {
       totalWagered: betsData.reduce((s, b) => s + Number(b.stake), 0),
     });
     if (limitsData) {
+      const ld = limitsData as any;
       setLimitsForm({
-        min_stake: String(limitsData.min_stake),
-        max_stake: String(limitsData.max_stake),
-        max_win:   String(limitsData.max_win),
+        min_stake: String(ld.min_stake),
+        max_stake: String(ld.max_stake),
+        max_win:   String(ld.max_win),
       });
     }
     setLoading(false);
@@ -120,8 +120,8 @@ const AdminDashboard: React.FC = () => {
 
   const handleSaveLimits = async () => {
     setLimitsSaving(true);
-    const { error } = await supabase
-      .from("bet_limits")
+    const { error } = await (supabase
+      .from("bet_limits" as any) as any)
       .update({ min_stake: Number(limitsForm.min_stake), max_stake: Number(limitsForm.max_stake), max_win: Number(limitsForm.max_win) })
       .eq("market_name", "default");
     setLimitsMsg(error ? { text: "Failed to save limits", ok: false } : { text: "Limits saved successfully", ok: true });

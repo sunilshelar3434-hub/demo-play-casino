@@ -119,10 +119,17 @@ const Wallet: React.FC = () => {
     }
     setProcessing(true);
     const method = paymentMethods.methods.find(m => m.id === selectedMethodId);
-    const ok = await wallet.debit(amt, `Withdrawal to ${method?.label ?? "account"}`);
-    flash(ok ? `₹${amt.toLocaleString("en-IN")} withdrawal initiated` : "Withdrawal failed.", ok);
+    const result = await wallet.withdraw(amt, `Withdrawal to ${method?.label ?? "account"}`);
+    if (result.success) {
+      const msg = result.status === "pending" 
+        ? `₹${amt.toLocaleString("en-IN")} withdrawal under review` 
+        : `₹${amt.toLocaleString("en-IN")} withdrawal initiated`;
+      flash(msg, true);
+      setAmount(""); setPanel("none"); withdrawalLimits.refresh();
+    } else {
+      flash(result.message ?? "Withdrawal failed.", false);
+    }
     setProcessing(false);
-    if (ok) { setAmount(""); setPanel("none"); withdrawalLimits.refresh(); }
   };
 
   return (
@@ -393,9 +400,9 @@ const Wallet: React.FC = () => {
                       >
                         {tx.amount > 0 ? "+" : ""}₹{Math.abs(tx.amount).toLocaleString("en-IN")}
                       </span>
-                      {tx.balance_after !== null && (
+                      {(tx as any).balance_after != null && (
                         <p className="font-mono text-[0.5rem] text-dim-foreground">
-                          Bal: ₹{tx.balance_after.toLocaleString("en-IN")}
+                          Bal: ₹{Number((tx as any).balance_after).toLocaleString("en-IN")}
                         </p>
                       )}
                     </div>
