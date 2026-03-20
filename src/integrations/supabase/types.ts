@@ -131,12 +131,71 @@ export type Database = {
         }
         Relationships: []
       }
+      user_risk_scores: {
+        Row: {
+          account_status: string
+          created_at: string
+          flags: string[]
+          last_evaluated_at: string | null
+          risk_level: string
+          risk_score: number
+          user_id: string
+        }
+        Insert: {
+          account_status?: string
+          created_at?: string
+          flags?: string[]
+          last_evaluated_at?: string | null
+          risk_level?: string
+          risk_score?: number
+          user_id: string
+        }
+        Update: {
+          account_status?: string
+          created_at?: string
+          flags?: string[]
+          last_evaluated_at?: string | null
+          risk_level?: string
+          risk_score?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      wallet_credit: {
+        Args: {
+          p_amount: number
+          p_description?: string
+          p_idempotency_key?: string
+          p_type: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
+      wallet_debit: {
+        Args: {
+          p_amount: number
+          p_description?: string
+          p_idempotency_key?: string
+          p_type: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
+      wallet_get_balance: { Args: { p_user_id: string }; Returns: Json }
+      wallet_withdraw_with_checks: {
+        Args: {
+          p_amount: number
+          p_description?: string
+          p_idempotency_key?: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
     }
     Enums: {
       [_ in never]: never
